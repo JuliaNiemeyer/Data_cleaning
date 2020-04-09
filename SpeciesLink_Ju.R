@@ -8,9 +8,11 @@ getwd()
 # Passo 2. botar como scienficname que vai entrar na função
 #scientificName = c('..........')
 
+######Decidir qual vai ser o nome do diretório
+#dir = "SpeciesLink"
 
 ## get records from species link and save ir to the "results" directory (it's part of the function)
-spLink <- rspeciesLink(dir = "SpeciesLink", filename = "raw_data", scientificName =  c("Blastocerus dichotomus", "Blanchetia heterotricha"), Coordinates = "Yes")
+spLink <- rspeciesLink (filename = "raw_data", scientificName =  c("Blastocerus dichotomus", "Blanchetia heterotricha"), Coordinates = "Yes")
 
 #read the above table as csv to work on it
 table <- read.csv("./results/raw_data.csv")
@@ -40,6 +42,15 @@ geo.clean <- clean_coordinates(x = splink.coord,
 #nrow(geo.clean)
 #View(geo.clean)
 
+# Cleaning by removing the duplicates -------------------------------------
+
+duplicata <- duplicated(geo.clean[, c('decimalLongitude', 'decimalLatitude')])
+#which(duplicata)
+#sum(duplicata)
+geo.clean2 <- geo.clean[!duplicata, ]
+
+#head(splink.coord2)
+#nrow(splink.coord2)
 
 #plotting
 #par(mfrow = c(1, 2))
@@ -49,12 +60,8 @@ geo.clean <- clean_coordinates(x = splink.coord,
 #map(, , , add = TRUE)
 #par(mfrow = c(1, 1))
 
-## Adicionar aqui uma parte que retira duplicata
-
-
-
 dir.create("./results/clean_data")
-write.csv(occs,
-          "./results/data/raw_data.csv",
+write.csv(geo.clean2,
+          "./results/clean_data/clean_data.csv",
           row.names = FALSE)
 
