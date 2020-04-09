@@ -196,7 +196,7 @@ occs.new.geo2 <- merge(occs, occs.new.geo,
 
 ```{r}
 write.csv(occs.new.geo2, 
-          "../data/data_coordinate_check.csv", 
+          "../data_ju/data_coordinate_check.csv", 
           row.names = FALSE)
 ```
 
