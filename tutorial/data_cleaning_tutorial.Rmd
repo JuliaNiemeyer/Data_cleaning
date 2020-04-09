@@ -41,12 +41,13 @@ library(maps)
 
 First, let's download the data of a tree species from South America *Cariniana legalis* (Kuntze) from the Lecythidaceae family.
 
-#mudar para uma das minhas sp. *Blastocerus dichotomus*
+#mudar para uma das minhas sp.(mamifero) *Blastocerus dichotomus*
+#2. mudar para uma das minhas sp.(planta) *Blanchetia heterotricha*
 
 You can also embed plots, for example:
 
 ```{r occs}
-species <- "Blastocerus dichotomus"
+species <- "Blanchetia heterotricha"
 occs <- occ_search(scientificName = species, 
                    return = "data")
 nrow(occs) #number of records 
@@ -67,7 +68,7 @@ In order to guarantee the documentation of all steps, saving the raw data is ess
 ```{r save-raw}
 dir.create("../data_ju")
 write.csv(occs, 
-          "../data_ju/raw_data.csv", 
+          "../data_ju/raw_data_Blanchetia_heterotricha.csv", 
           row.names = FALSE)
 ```
 
@@ -81,7 +82,7 @@ sort(unique(occs$scientificName))
 
 In this particular case, we have two synonyms *Cariniana brasiliensis* and *Couratari legalis*. In the gbif data there is already a column showing the currently accepted taxonomy:
 
-#no meu caso só tem um nome: "Blastocerus dichotomus (Illiger, 1815)" 
+#no meu caso só tem um nome: "Blanchetia heterotricha DC" 
 
 ```{r sp-accepted}
 table(occs$taxonomicStatus)
@@ -121,13 +122,16 @@ new.tax <- data.frame(scientificName = species.names,
 occs.new.tax <- merge(occs, new.tax, by = "scientificName")
 ```
 
+# Essa parte aqui não fez diferença nenhuma pra mim. Não sei se é pq não tem mais de um nome, mas não tem diferença entre occs e occs.new.tax
+
+
 ## Exporting data after taxonomy check
 
 To guarantee the documentation of all steps, we will export the data after the taxonomy check. 
 
 ```{r}
 write.csv(occs.new.tax, 
-          "../data/data_taxonomy_check.csv", 
+          "../data/data_taxonomy_check_Blanchetia_heterotricha.csv", 
           row.names = FALSE)
 ```
 
@@ -196,7 +200,8 @@ occs.new.geo2 <- merge(occs, occs.new.geo,
 
 ```{r}
 write.csv(occs.new.geo2, 
-          "../data_ju/data_coordinate_check.csv", 
+          "../data_ju/data_coordinate_check_Blanchetia_heterotricha.csv", 
           row.names = FALSE)
 ```
+
 
