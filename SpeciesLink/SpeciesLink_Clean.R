@@ -19,13 +19,13 @@ library(maps)
 
 ######Decidir qual vai ser o nome do diretório
 #dir = "SpeciesLink"
-#scientificName =  c("Blastocerus dichotomus", "Blanchetia heterotricha")
+scientificName =  c("Apareiodon hasemani", "Caiman latirostris")
 
 ## get records from species link and save ir to the "results" directory (it's part of the function)
-spLink <- rspeciesLink(filename = "raw_data", scientificName = c("Blastocerus dichotomus", "Blanchetia heterotricha"), Coordinates = "Yes")
+spLink <- rspeciesLink(filename = "raw_data", scientificName = scientificName, Coordinates = "Yes")
 
 #read the above table as csv to work on it
-table <- read.csv("./SpeciesLink/results/raw_data.csv")
+table <- read.csv("./results/raw_data.csv")
 
 #nrow(table)
 #View(table)
@@ -55,10 +55,10 @@ geo.clean <- clean_coordinates(x = splink.coord,
 ## Here we have to modify so it cleans duplicates for the same species (the way is is now if there are 2 diff species in a same coordinate it is seen as duplicates and it is removed).
 
 #Split the table in x tables: in which x is the the number of scpecies in our table.
-splitData <- split(table, table$scientificName)
+splitData <- split(geo.clean, geo.clean$scientificName)
 
 #Do a loop to clean each splited table separately
-for (a in splitData) {
+for (a in 1:length(splitData)) {
   duplicata <- duplicated(splitData[[a]][, c('decimalLongitude', 'decimalLatitude')])
   #which(duplicata)
   #sum(duplicata)
@@ -72,15 +72,15 @@ geo.clean2 <- do.call("rbind", splitData)
 
 #plotting in maps to see points of occurence (if you want to keep track of what's going on)
 #par(mfrow = c(1, 2))
-#plot(decimalLatitude ~ decimalLongitude, data = occs)
+#plot(decimalLatitude ~ decimalLongitude, data = table)
 #map(, , , add = TRUE)
-#plot(decimalLatitude ~ decimalLongitude, data = geo.clean)
+#plot(decimalLatitude ~ decimalLongitude, data = geo.clean2)
 #map(, , , add = TRUE)
 #par(mfrow = c(1, 1))
 
 #Creates an output drive and save the final csv file
-dir.create("./SpeciesLink/results/clean_data")
+dir.create("./results/clean_data")
 write.csv(geo.clean2,
-          "./SpeciesLink/results/clean_data/clean_data.csv",
+          "./results/clean_data/clean_data.csv",
           row.names = FALSE)
 
