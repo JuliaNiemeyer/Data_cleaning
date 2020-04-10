@@ -43,7 +43,7 @@ geo.clean <- clean_coordinates(x = splink.coord,
 #View(geo.clean)
 
 # Cleaning by removing the duplicates -------------------------------------
-
+## Here we have to modify so it cleans duplicates for the same species (the way is is now if there are 2 diff species in a same coordinate it is seen as duplicates and it is removed).
 duplicata <- duplicated(geo.clean[, c('decimalLongitude', 'decimalLatitude')])
 #which(duplicata)
 #sum(duplicata)
