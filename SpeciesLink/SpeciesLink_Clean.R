@@ -1,6 +1,17 @@
-getwd()
+######################
 
-##Start by loading packages
+#title: "Basic workflow for getting occurences from SpeciesLink and biodiversity data cleaning using R"
+#author: "Julia Niemeyer"
+#date: April 2020
+
+######################
+
+##Start by loading packages. If you don't have them you should install them frist
+
+#install.packages("Taxonstand")
+#install.packages("CoordinateCleaner")
+#install.packages("maps")
+
 library(Taxonstand)
 library(CoordinateCleaner)
 library(maps)
@@ -8,20 +19,17 @@ library(maps)
 ## Then run rspeciesLink function in SpeciesLink_function.R
 
 
-#mudar para uma das minhas sp.(mamifero) *Blastocerus dichotomus*
-#2. mudar para uma das minhas sp.(planta) *Blanchetia heterotricha*
-
 ######## WORK ON IT
 #inserir todas as espécies em forma de lista:
 #passo 1. ler a tabela ue eu criei e transformar a lista de espécies em lista
 # Passo 2. botar como scienficname que vai entrar na função
 #scientificName = c('..........')
 
-######Decidir qual vai ser o nome do diretório
-#dir = "SpeciesLink"
-scientificName =  c("Apareiodon hasemani", "Caiman latirostris")
+# Read the spreadsheet with the names of all your species (should be located in the "data" folder).
+Sptable <- read.csv("./data/Species_ex.csv")
+scientificName <- as.vector(Sptable$Species)
 
-## get records from species link and save ir to the "results" directory (it's part of the function)
+## get records from SpeciesLink and save ir to the "results" directory (the creation of the results directory is part of the rspeciesLink function)
 spLink <- rspeciesLink(filename = "raw_data", scientificName = scientificName, Coordinates = "Yes")
 
 #read the above table as csv to work on it
@@ -41,6 +49,8 @@ splink.coord <- table[!is.na(table$decimalLatitude) & !is.na(table$decimalLongit
 #Note: at this moment having a specific ID code for each observation is essential. The raw data already provides an ID in the column `gbifID`.
 
 # output w/ only potential correct coordinates
+
+#####PERGUNTA: será que isso aqui deve ser feito também por espécie separada?
 geo.clean <- clean_coordinates(x = splink.coord,
                                lon = "decimalLongitude",
                                lat = "decimalLatitude",
@@ -51,8 +61,6 @@ geo.clean <- clean_coordinates(x = splink.coord,
 #View(geo.clean)
 
 # Cleaning by removing the duplicates -------------------------------------
-
-## Here we have to modify so it cleans duplicates for the same species (the way is is now if there are 2 diff species in a same coordinate it is seen as duplicates and it is removed).
 
 #Split the table in x tables: in which x is the the number of scpecies in our table.
 splitData <- split(geo.clean, geo.clean$scientificName)
