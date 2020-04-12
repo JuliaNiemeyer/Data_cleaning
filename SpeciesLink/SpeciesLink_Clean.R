@@ -17,23 +17,23 @@ library(CoordinateCleaner)
 library(maps)
 
 ## Then run rspeciesLink function in SpeciesLink_function.R
-
+##TEM COMO COLOCAR UMA CHAMADA PRA OUTRO SCRIPT AQUI DENTRO PRA RODAR AUTOMATICO?
 
 ######## WORK ON IT
-#inserir todas as espécies em forma de lista:
-#passo 1. ler a tabela ue eu criei e transformar a lista de espécies em lista
-# Passo 2. botar como scienficname que vai entrar na função
-#scientificName = c('..........')
+
+## PS. A BOA É JUNTAR COM A TABELA DO GBIF ANTES.
 
 # Read the spreadsheet with the names of all your species (should be located in the "data" folder).
 Sptable <- read.csv("./data/Species_ex.csv")
 scientificName <- as.vector(Sptable$Species)
 
+for (a in 1:length(scientificName)) {
 ## get records from SpeciesLink and save ir to the "results" directory (the creation of the results directory is part of the rspeciesLink function)
-spLink <- rspeciesLink(filename = "raw_data", scientificName = scientificName, Coordinates = "Yes")
+spLink <- rspeciesLink(filename = paste0("raw_data_",scientificName[a]), scientificName = scientificName[a], Coordinates = "Yes")
 
 #read the above table as csv to work on it
-table <- read.csv("./results/raw_data.csv")
+file_path <- file.path("./results", paste0("raw_data_",scientificName[a], ".csv"))
+table <- read.csv(file_path)
 
 #nrow(table)
 #View(table)
@@ -50,32 +50,36 @@ splink.coord <- table[!is.na(table$decimalLatitude) & !is.na(table$decimalLongit
 
 # output w/ only potential correct coordinates
 
-#####PERGUNTA: será que isso aqui deve ser feito também por espécie separada?
+# Cleaning data -------------------------------------
+##TA UMA MERDA ISSO AQUI CONSERTAR!!
+
+#Split the table in x tables: in which x is the the number of scpecies in our table.
+#splitData <- split(splink.coord, splink.coord$scientificName)
+#geo.clean <- splitData
+#unique <- unique(splink.coord$scientificName)
+#data.name <- splitData
+
+#Do a loop to clean each splited table separately
+
+#####PERGUNTA: tirar pontos por "locality" == zoologico etc?
+#sp_name <- paste0("splitData$", splink.coord$scientificName[a], "`")
+
+#View(splitData)
 geo.clean <- clean_coordinates(x = splink.coord,
                                lon = "decimalLongitude",
                                lat = "decimalLatitude",
                                species = "scientificName",
                                value = "clean")
-
 #nrow(geo.clean)
 #View(geo.clean)
-
-# Cleaning by removing the duplicates -------------------------------------
-
-#Split the table in x tables: in which x is the the number of scpecies in our table.
-splitData <- split(geo.clean, geo.clean$scientificName)
-
-#Do a loop to clean each splited table separately
-for (a in 1:length(splitData)) {
-  duplicata <- duplicated(splitData[[a]][, c('decimalLongitude', 'decimalLatitude')])
-  #which(duplicata)
-  #sum(duplicata)
-  splitData[[a]] <- splitData[[a]][!duplicata, ]
- # newData <- lapply(splitData[a], remove.duplicates, zero = 1, remove.second = TRUE)
-}
+duplicata <- duplicated(geo.clean[, c('decimalLongitude', 'decimalLatitude')])
+#which(duplicata)
+#sum(duplicata)
+geo.clean2 <- geo.clean[!duplicata, ]
+# newData <- lapply(splitData[a], remove.duplicates, zero = 1, remove.second = TRUE)
 
 # Now combine clean splited tables into one single table
-geo.clean2 <- do.call("rbind", splitData)
+#geo.clean <- do.call("rbind", splitData)
 
 
 #plotting in maps to see points of occurence (if you want to keep track of what's going on)
@@ -85,10 +89,9 @@ geo.clean2 <- do.call("rbind", splitData)
 #plot(decimalLatitude ~ decimalLongitude, data = geo.clean2)
 #map(, , , add = TRUE)
 #par(mfrow = c(1, 1))
+#nrow(geo.clean2)
 
-#Creates an output drive and save the final csv file
-dir.create("./results/clean_data")
 write.csv(geo.clean2,
-          "./results/clean_data/clean_data.csv",
+          paste0("./results/clean_data_",table$scientificName[a],".csv"),
           row.names = FALSE)
-
+}
