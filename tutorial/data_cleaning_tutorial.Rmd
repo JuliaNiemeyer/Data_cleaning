@@ -87,11 +87,8 @@ In this particular case, we have two synonyms *Cariniana brasiliensis* and *Cour
 ```{r sp-accepted}
 table(occs$taxonomicStatus)
 ```
-#No meu caso todos os 500 são accepted
 
 Let's use the function `TPL()` from package `taxonstand` to check if the taxonomic updates in the gbif data are correct. This function receives a vector containing a list of species and performs both ortographical and nomenclature checking. Nomenclature checking follows [The Plant List](http://www.theplantlist.org/). 
-
-##PERGUNTA: E NO CASO DE NÃO SER PLANTA??????
 
 We will first generate a list with unique species names and combine it to the data. This is preferable because we do not need to check more than once the same name and, in the case of working with several species, it will make the workflow faster. 
 
