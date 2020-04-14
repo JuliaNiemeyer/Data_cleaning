@@ -20,7 +20,7 @@ library(maps)
 library(dplyr)
 library(devtools)
 
-devtools::install_github("saramortara/rocc", force = TRUE)
+#devtools::install_github("saramortara/rocc", force = TRUE)
 library(rocc)
 
 
@@ -62,16 +62,13 @@ gbif <- read.csv(file_path2)
 ########TAXONOMIC CLEANING
 
 ##Check status - function by Sara Mortara - ESTÁ DANDO PROBLEMA
-check_status_gbif <- check_status(scientificName = gbif$scientificName)
+check_status_gbif <- check_string(scientificName = gbif$scientificName)
 head(check_status_gbif)
+gbif$scientificName <- check_status_gbif$scientificName_new
 
-check_status_spLink <- check_status(scientificName = spLink$scientificName)
+check_status_spLink <- check_string(scientificName = spLink$scientificName)
 head(check_status_spLink)
-
-##Check taxonomy - Function by sara Mortara
-
-
-
+spLink$scientificName <- check_status_spLink$scientificName_new
 
 #nrow(spLink)
 #nrow(gbif)
@@ -85,7 +82,6 @@ splink_table <- data.frame(spLink$record_id,spLink$scientificName, spLink$decima
 splink_table$DataSource <- "SpeciesLink"
 names(splink_table)[names(splink_table) == "spLink.record_id"] <- "ID"
 names(splink_table)[names(splink_table) == "spLink.scientificName"] <- "species"
-splink_table$species <- check_status_spLink$scientificName_new
 names(splink_table)[names(splink_table) == "spLink.decimalLatitude"] <- "decimalLatitude"
 names(splink_table)[names(splink_table) == "spLink.decimalLongitude"] <- "decimalLongitude"
 
@@ -94,7 +90,6 @@ gbif_table <- data.frame(gbif$key, gbif$scientificName, gbif$decimalLatitude, gb
 gbif_table$DataSource <- "GBIF"
 names(gbif_table)[names(gbif_table) == "gbif.key"] <- "ID"
 names(gbif_table)[names(gbif_table) == "gbif.scientificName"] <- "species"
-gbif_table$species <- check_status_gbif$scientificName_new
 names(gbif_table)[names(gbif_table) == "gbif.decimalLatitude"] <- "decimalLatitude"
 names(gbif_table)[names(gbif_table) == "gbif.decimalLongitude"] <- "decimalLongitude"
 
