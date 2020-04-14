@@ -47,7 +47,7 @@ First, let's download the data of a tree species from South America *Cariniana l
 You can also embed plots, for example:
 
 ```{r occs}
-species <- "Blanchetia heterotricha"
+species <- "Chrysocyon brachyurus"
 occs <- occ_search(scientificName = species, 
                    return = "data")
 nrow(occs) #number of records 
@@ -118,9 +118,6 @@ new.tax <- data.frame(scientificName = species.names,
 # now we are merging raw data and checked data
 occs.new.tax <- merge(occs, new.tax, by = "scientificName")
 ```
-
-# Essa parte aqui não fez diferença nenhuma pra mim. Não sei se é pq não tem mais de um nome, mas não tem diferença entre occs e occs.new.tax
-
 
 ## Exporting data after taxonomy check
 

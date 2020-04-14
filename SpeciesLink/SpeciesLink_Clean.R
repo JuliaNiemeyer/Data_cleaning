@@ -20,15 +20,16 @@ library(maps)
 library(dplyr)
 library(devtools)
 
-devtools::install_github("saramortara/rocc")
+devtools::install_github("saramortara/rocc", force = TRUE)
 library(rocc)
 
+
 ## Then run rspeciesLink function in SpeciesLink_function.R
+
 ##TEM COMO COLOCAR UMA CHAMADA PRA OUTRO SCRIPT AQUI DENTRO PRA RODAR AUTOMATICO?
 
 ######## WORK ON IT
 
-## PS. A BOA É JUNTAR COM A TABELA DO GBIF ANTES.
 
 # Read the spreadsheet with the names of all your species (should be located in the "data" folder).
 Sptable <- read.csv("./data/Species_ex.csv")
@@ -60,14 +61,14 @@ gbif <- read.csv(file_path2)
 
 ########TAXONOMIC CLEANING
 
-##Check status - function by Sara Mortara
+##Check status - function by Sara Mortara - ESTÁ DANDO PROBLEMA
 check_status_gbif <- check_status(scientificName = gbif$scientificName)
 head(check_status_gbif)
 
 check_status_spLink <- check_status(scientificName = spLink$scientificName)
 head(check_status_spLink)
 
-##Check taxonomic status - Function by sara Mortara
+##Check taxonomy - Function by sara Mortara
 
 
 
