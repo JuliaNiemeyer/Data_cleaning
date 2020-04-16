@@ -135,6 +135,12 @@ geo.clean2 <- geo.clean[!duplicata, ]
 #par(mfrow = c(1, 1))
 
 
+#############################################
+########### Important: TO DO
+##Check if species has more than 20 occurences in total after cleaning. If not, than it can't be used in ENM and should not be save (Stockwell & Peterson, 2002).
+#############################################
+
+### If is has more than 20 occurences, than keep it and sabe it to a csv file.
 write.csv(geo.clean2,
           paste0("./results/clean_data_",scientificName[a],".csv"),
           row.names = FALSE)
