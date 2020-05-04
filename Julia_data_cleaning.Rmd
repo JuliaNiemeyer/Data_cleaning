@@ -1,0 +1,82 @@
+---
+title: "Data gathering and cleaning - GBIF & Species Link"
+author: "JuliaNiemeyer"
+date: "28/04/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```
+install.packages("rgbif")
+install.packages("Taxonstand")
+install.packages("CoordinateCleaner")
+install.packages("maps")
+install.packages("dplyr")
+install.packages("devtools")
+```
+``` {if needed install the rocc package:}
+devtools::install_github("saramortara/rocc", force = TRUE)
+```
+
+
+``` {r loading pkg}
+library(rgbif)
+library(Taxonstand)
+library(CoordinateCleaner)
+library(maps)
+library(dplyr)
+library(devtools)
+library(rocc)
+```
+
+Read the spreadsheet with the names of all your species (should be located in the "data" folder).
+
+``` {read table and vector with species names}
+Sptable <- read.csv("./data/Species_ex.csv")
+scientificName <- as.vector(Sptable$Species)
+
+```
+To do a trial before running the whole dataset, I will run only for species 4
+
+``` {for a trial}
+  a = 4
+
+```
+
+##I disabled the for so I can run it only for a=4  
+for (a in 1:length(scientificName)) {
+
+Get records from SpeciesLink and save ir to the "results" directory (the creation of the results directory is part of the rspeciesLink function)
+   
+```{run the entire script}
+rspeciesLink(filename = paste0("raw_data_SpeciesLink_",scientificName[a]), scientificName = scientificName[a], Coordinates = "Yes")
+    
+#read the above table as csv to work on it
+file_path <- file.path("./results", paste0("raw_data_SpeciesLink_",scientificName[a], ".csv"))
+spLink <- read.csv(file_path)
+#View(spLink)
+    
+#Get occurence points from GBIF
+gbif_input <- occ_search(scientificName = scientificName[a],
+                             return = "data")
+    
+#Save it as a csv file
+file_path2 <- file.path("./results", paste0("raw_data_GBIF_",scientificName[a], ".csv"))
+write.csv(gbif_input, file_path2, row.names = FALSE)
+gbif <- read.csv(file_path2)
+#View(gbif)
+    
+# 2. Checking species taxonomy
+#Let's check the unique entries for the species name we just searched.
+    
+########TAXONOMIC CLEANING
+  
+##Check status_function by Sara Mortara 
+
+```
+
+

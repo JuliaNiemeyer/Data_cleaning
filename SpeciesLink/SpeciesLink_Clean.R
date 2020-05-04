@@ -12,6 +12,7 @@
 #install.packages("CoordinateCleaner")
 #install.packages("maps")
 #install.packages("devtools")
+#install.packages("dplyr")
 
 library(rgbif)
 library(Taxonstand)
@@ -24,17 +25,9 @@ library(devtools)
 library(rocc)
 
 
-## Then run rspeciesLink function in SpeciesLink_function.R
-
-##TEM COMO COLOCAR UMA CHAMADA PRA OUTRO SCRIPT AQUI DENTRO PRA RODAR AUTOMATICO?
-
-######## WORK ON IT
-
-
 # Read the spreadsheet with the names of all your species (should be located in the "data" folder).
 Sptable <- read.csv("./data/Species_ex.csv")
 scientificName <- as.vector(Sptable$Species)
-
 
 for (a in 1:length(scientificName)) {
 ## get records from SpeciesLink and save ir to the "results" directory (the creation of the results directory is part of the rspeciesLink function)
@@ -53,7 +46,7 @@ gbif_input <- occ_search(scientificName = scientificName[a],
 file_path2 <- file.path("./results", paste0("raw_data_GBIF_",scientificName[a], ".csv"))
 write.csv(gbif_input, file_path2, row.names = FALSE)
 gbif <- read.csv(file_path2)
-
+#View(gbif)
 
 # 2. Checking species taxonomy
 
@@ -61,7 +54,7 @@ gbif <- read.csv(file_path2)
 
 ########TAXONOMIC CLEANING
 
-##Check status - function by Sara Mortara - ESTÁ DANDO PROBLEMA
+##Check status - function by Sara Mortara
 check_status_gbif <- check_string(scientificName = gbif$scientificName)
 head(check_status_gbif)
 gbif$scientificName <- check_status_gbif$scientificName_new
@@ -76,6 +69,7 @@ spLink$scientificName <- check_status_spLink$scientificName_new
 
 #Merge the two tables
 #Get onlye species names, lat, long and ID. Rename columns of the two datasets to be the same. Add a column that provides info about data source.
+head(spLink)
 
 splink_table <- data.frame(spLink$record_id,spLink$scientificName, spLink$decimalLatitude, spLink$decimalLongitude)
 
@@ -84,6 +78,8 @@ names(splink_table)[names(splink_table) == "spLink.record_id"] <- "ID"
 names(splink_table)[names(splink_table) == "spLink.scientificName"] <- "species"
 names(splink_table)[names(splink_table) == "spLink.decimalLatitude"] <- "decimalLatitude"
 names(splink_table)[names(splink_table) == "spLink.decimalLongitude"] <- "decimalLongitude"
+
+head(gbif)
 
 gbif_table <- data.frame(gbif$key, gbif$scientificName, gbif$decimalLatitude, gbif$decimalLongitude)
 
@@ -96,8 +92,8 @@ names(gbif_table)[names(gbif_table) == "gbif.decimalLongitude"] <- "decimalLongi
 #merge the two datasets to clean them together
 merge <- bind_rows(splink_table, gbif_table)
 #View(merge)
-file_path3 <- file.path("./results", paste0("merged_",scientificName[a], ".csv"))
-write.csv(merge, file_path3, row.names = FALSE)
+#file_path3 <- file.path("./results", paste0("merged_",scientificName[a], ".csv"))
+#write.csv(merge, file_path3, row.names = FALSE)
 
 # output w/ only potential correct coordinates
 
@@ -105,7 +101,11 @@ write.csv(merge, file_path3, row.names = FALSE)
 
 #Clean NAs
 merge_coord <- merge[!is.na(merge$decimalLatitude) & !is.na(merge$decimalLongitude),]
+#Set rownames to NULL so it does not get errors in geo_clean function
+rownames(merge_coord ) <- NULL
+
 #nrow(merge_coord)
+#View(merge_coord)
 
 #Now we will use the the function `clean_coordinates()` from the `CoordinateCleaner` package to clean the species records. This function checks for common errors in coordinates such as institutional coordinates, sea coordinates, outliers, zeros, centroids, etc. This function does not accept not available information (here addressed as "NA") so we will first select only data that have a numerical value for both latitude and longitude.
 

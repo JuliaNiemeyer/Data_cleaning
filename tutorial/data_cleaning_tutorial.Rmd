@@ -137,7 +137,6 @@ First, let's inspect visually the coordinates in the raw data.
 plot(decimalLatitude ~ decimalLongitude, data = occs)
 map(, , , add = TRUE)
 ```
-# A função map() tá dando erro.
 
 Now we will use the the function `clean_coordinates()` from the `CoordinateCleaner` package to clean the species records. This function checks for common errors in coordinates such as institutional coordinates, sea coordinates, outliers, zeros, centroids, etc. This function does not accept not available information (here addressed as "NA") so we will first select only data that have a numerical value for both latitude and longitude. 
 
