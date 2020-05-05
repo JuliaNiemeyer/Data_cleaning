@@ -30,6 +30,10 @@ Sptable <- read.csv("./data/Species_ex.csv")
 scientificName <- as.vector(Sptable$Species)
 
 for (a in 1:length(scientificName)) {
+
+  ## TEM que colocar um teste aqui pq da erro se species link fica vazio.
+
+
 ## get records from SpeciesLink and save ir to the "results" directory (the creation of the results directory is part of the rspeciesLink function)
 rspeciesLink(filename = paste0("raw_data_SpeciesLink_",scientificName[a]), scientificName = scientificName[a], Coordinates = "Yes")
 
