@@ -34,13 +34,14 @@ dir.create("./results/clean_data")
 
 #start the data gathering & cleaning
 for (a in 1:length(scientificName)) {
+  message("starting the search for ", paste0(scientificName[a]))
 ## get records from SpeciesLink and save ir to the "results" directory (the creation of the results directory is part of the rspeciesLink function)
 r <- rspeciesLink(filename = paste0("raw_data_SpeciesLink_",scientificName[a]), scientificName = scientificName[a], Coordinates = "Yes")
 
 #Checking if the output is empty (no occurrence data available in SpeciesLink for this species. Will work with GBIF only)
 if (is.null(dim(r$data))) {
   #Get occurence points from GBIF
-  gbif_input <- occ_search(scientificName = scientificName[a],
+  gbif_input <- occ_search(scientificName = scientificName[a], hasCoordinate = TRUE,
                            return = "data")
 
   if (is.null(dim(gbif_input))) {
@@ -81,10 +82,10 @@ if (is.null(dim(r$data))) {
   names(gbif_table)[names(gbif_table) == "gbif.scientificStatus"] <- "scientificStatus"
 
   # output w/ only potential correct coordinates
-
+  merge <- bind_rows(gbif_table)
   # Cleaning data ------------------------------------
   #Clean NAs
-gbif_table_coord <- gbif_table[!is.na(gbif_table$decimalLatitude) & !is.na(gbif_table$decimalLongitude),]
+gbif_table_coord <- merge[!is.na(merge$decimalLatitude) & !is.na(merge$decimalLongitude),]
   #Set rownames to NULL so it does not get errors in geo_clean function
 rownames(gbif_table_coord) <- NULL
   #nrow(gbif_table_coord)
@@ -117,7 +118,7 @@ rownames(gbif_table_coord) <- NULL
   ##Check if species has more than 20 occurences in total after cleaning. If not, than it can't be used in ENM and should not be save (Stockwell & Peterson, 2002).
 
   #############################################
-
+  message("writing final output file")
   ### If is has more than 20 occurences, than keep it and sabe it to a csv file.
   write.csv(geo.clean2,
             paste0("./results/clean_data/clean_data_",scientificName[a],".csv"),
@@ -131,22 +132,19 @@ spLink <- read.csv(file_path)
 #View(spLink)
 
 #Get occurence points from GBIF
-gbif_input <- occ_search(scientificName = scientificName[a],
+gbif_input <- occ_search(scientificName = scientificName[a], hasCoordinate = TRUE,
                    return = "data")
 
 if (is.null(dim(gbif_input))) {
+  ## ESSA PARTE AQUI ESTÁ DANDO ERRO
 
   message("Gbif is empty. Working with SpeciesLink only.")
 
   check_status_spLink <- check_string(scientificName = spLink$scientificName)
-  head(check_status_spLink)
+  #head(check_status_spLink)
   spLink$scientificName <- check_status_spLink$scientificName_new
   spLink$scientificStatus <- check_status_spLink$scientificName_status
   spLink <- subset(spLink, scientificStatus != "indet")
-
-  #nrow(spLink)
-  #nrow(gbif)
-  #View(gbif)
 
   #Get onlye species names, lat, long and ID. Rename columns of the two datasets to be the same. Add a column that provides info about data source.
 
@@ -160,7 +158,7 @@ if (is.null(dim(gbif_input))) {
   names(splink_table)[names(splink_table) == "spLink.scientificStatus"] <- "scientificStatus"
 
     # output w/ only potential correct coordinates
-
+  merge <- bind_rows(splink_table)
   # Cleaning data -------------------------------------
 
   #Clean NAs
@@ -171,8 +169,8 @@ if (is.null(dim(gbif_input))) {
   #In case geo_clean finds specific rows with errors, use this to clean it. Then continue manually.
   #merge_coord <- merge_coord[-c(row1, row2, row1...), ]
 
-  #nrow(merge_coord)
-  #View(merge_coord)
+  #nrow(splink_table_coord)
+  #View(splink_table_coord)
 
   #Now we will use the the function `clean_coordinates()` from the `CoordinateCleaner` package to clean the species records. This function checks for common errors in coordinates such as institutional coordinates, sea coordinates, outliers, zeros, centroids, etc. This function does not accept not available information (here addressed as "NA") so we will first select only data that have a numerical value for both latitude and longitude.
 
@@ -206,14 +204,14 @@ if (is.null(dim(gbif_input))) {
   ########### Important: TO DO
   ##Check if species has more than 20 occurences in total after cleaning. If not, than it can't be used in ENM and should not be save (Stockwell & Peterson, 2002).
   #############################################
-
+  message("writing final output file")
   ### If is has more than 20 occurences, than keep it and sabe it to a csv file.
   write.csv(geo.clean2,
             paste0("./results/clean_data/clean_data_",scientificName[a],".csv"),
             row.names = FALSE)
 
 
-  }
+  } else {
 
 message("GBIF & SeciesLink ok. Starting to clean")
 
@@ -235,6 +233,7 @@ check_status_gbif <- check_string(scientificName = gbif$scientificName)
 #head(check_status_gbif)
 gbif$scientificStatus <- check_status_gbif$scientificName_status
 gbif$scientificName <- check_status_gbif$scientificName_new
+
 ##WORK ON THIS
 ##Here the script needs to replace name only IF NAME IS VALID (e.g. if "indet" > discart )
 gbif <- subset(gbif, scientificStatus != "indet")
@@ -326,8 +325,10 @@ geo.clean2 <- geo.clean[!duplicata, ]
 #############################################
 
 ### If is has more than 20 occurences, than keep it and sabe it to a csv file.
+message("writing final output file")
 write.csv(geo.clean2,
           paste0("./results/clean_data/clean_data_",scientificName[a],".csv"),
           row.names = FALSE)
+}
 }
 }
